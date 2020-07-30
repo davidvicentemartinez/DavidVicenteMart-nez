@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from numpy_financial import pmt, ipmt, ppmt, npv, irr
 from enum import Enum
@@ -213,14 +214,40 @@ class EconomicAnalysis:
         return df
 
     def financial_metrics(self, discount_rate):
-        print(self.cash_flow)
         assert self.cash_flow is not None
         NPV = npv(discount_rate, self.cash_flow)
         IRR = irr(self.cash_flow)
         return NPV, IRR
 
-    #def payback(self):
+    def payback(self, df):
+        ccf = df.loc['Cumulative Cash Flow',:]
+        for i in range(ccf.size):
+            if ccf[i] >= 0:
+                return i, ccf[i]
 
+    def export_excel(self, df):
+        df.to_excel("EconomicAnalysis.xlsx")
+
+    def represent_values(self, df):
+        neto = df.loc["EAT",:]
+        ccf = df.loc['Cumulative Cash Flow',:]
+        cf = df.loc['Cash Flow',:]
+        incoming = df.loc['Sales',:]
+        outcoming = -1*(-1 * neto + incoming)
+        years = np.arange(20)
+        x = np.zeros(20)
+
+        plt.bar(years,incoming, color="green", width = 0.5)
+        plt.xticks(years)
+        plt.bar(years,outcoming, color="red", width = 0.5)
+        plt.bar(years,cf, color="orange", width = 0.5)
+        plt.plot(years,ccf, color="blue", marker="o")
+        plt.plot(years,x, color="black")
+
+        plt.title("Financial model result")
+        plt.xlabel("Years")
+        plt.ylabel("€")
+        plt.show()
 
 if __name__ == '__main__':
 
@@ -245,6 +272,11 @@ if __name__ == '__main__':
     interest = analysis.loan.loan_interest()
     df = analysis.financial_model(dep_array, interest, principal, 20)
     npv, irr = analysis.financial_metrics(0.053)
+    year, value = analysis.payback(df)
+    analysis.export_excel(df)
 
     print(df)
     print(f"The project has a net present value of {'{:,.2f}'.format(npv)}€ and an internal rate of return of {round(irr * 100, 2)}%")
+    print("Payback year: " + str(year) + ". Payback value: " + str(value) + "€")
+
+    analysis.represent_values(df)

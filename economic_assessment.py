@@ -203,7 +203,6 @@ if __name__ == '__main__':
 
     npv = npv(discount_rate, cash_flow)
     irr = irr(cash_flow)
-
     # Printing results
     print(df)
     print(f"The project has a net present value of {'{:,.2f}'.format(npv)}€ and an internal rate of return of {round(irr*100, 2)}%")
