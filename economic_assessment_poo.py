@@ -34,7 +34,7 @@ class Equipment:
         self.fm = fm
         self.installed = True
 
-    def applyWilliams(self, cost_ref, cap, cap_ref, n):
+    def william(self, cost_ref, cap, cap_ref, n):
         assert n <= 1
         assert n >= 0.6
 
@@ -43,9 +43,9 @@ class Equipment:
     def lang(self, C, Capital_factors):
         t = self.category
         C *= ((1 + Capital_factors.loc["fp"][t]) * self.fm + (
-                    Capital_factors.loc["fer"][t] + Capital_factors.loc["fel"][t]
-                    + Capital_factors.loc["fi"][t] + Capital_factors.loc["fc"][t]
-                    + Capital_factors.loc["fs"][t] + Capital_factors.loc["fl"][t]))
+                Capital_factors.loc["fer"][t] + Capital_factors.loc["fel"][t]
+                + Capital_factors.loc["fi"][t] + Capital_factors.loc["fc"][t]
+                + Capital_factors.loc["fs"][t] + Capital_factors.loc["fl"][t]))
         return C
 
 
@@ -78,6 +78,7 @@ class Boiler(Equipment):
 
         return C
 
+
 class Pump(Equipment):
     def __init__(self, Q, category=Category.fluids, fm=1, installed=True):
         super().__init__(category, fm, installed)
@@ -93,6 +94,7 @@ class Pump(Equipment):
             C = self.lang(C, Capital_factors)
 
         return C
+
 
 class SteamTurbine(Equipment):
     def __init__(self, kw, category=Category.fluids, fm=1, installed=True):
@@ -112,12 +114,46 @@ class SteamTurbine(Equipment):
         return C
 
 
+class Loan:
+    def __init__(self, quantity, interest, years):
+        self.quantity = quantity
+        self.interest = interest
+        self.years = years
+
+    def loan_payment(self):
+        assert self.quantity > 0
+        assert self.interest >= 0 and self.interest <= 1
+        assert self.years > 1
+        return pmt(self.interest, self.years, self.quantity)
+
+    def loan_interest(self):
+        assert self.quantity > 0
+        assert self.interest >= 0 and self.interest <= 1
+        assert self.years > 1
+        return ipmt(self.interest, np.arange(self.years) + 1, self.years, self.quantity)
+
+    def loan_principal(self):
+        assert self.quantity > 0
+        assert self.interest >= 0 and self.interest <= 1
+        assert self.years > 1
+        return ppmt(self.interest, np.arange(self.years) + 1, self.years, self.quantity)
+
+
+class EconomicAnalysis:
+    def __init__(self, capex, water, salaries, loan=None, capacity_factor=1):
+        self.capex = capex
+        self.capacity_factor = capacity_factor
+        self.water = water
+        self.salaries = salaries
+        self.loan = loan
+
+
 if __name__ == '__main__':
     print(Capital_factors)
 
-    boiler  = Boiler(10000, 70).boiler()
+    boiler = Boiler(10000, 70).boiler()
     turbine = SteamTurbine(1500).steam_turbine()
-    condenser = Equipment(Category.fluids).applyWilliams(400000,10000,15000,0.8)
+    condenser = Equipment(Category.fluids).william(400000, 10000, 15000, 0.8)
     pump = Pump(2.84).pump()
 
     print(boiler + turbine + condenser + pump)
