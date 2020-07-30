@@ -147,7 +147,7 @@ class EconomicAnalysis:
         self.salaries = salaries
         self.sales = sales
         self.loan = loan
-        self.cash_flow = None
+        self.cash_flow = np.zeros(1)
 
     def depreciation(self, annual_percent, residual_value = 0):
         """Compute annual depreciation of investment. Inputs:
@@ -213,11 +213,13 @@ class EconomicAnalysis:
         return df
 
     def financial_metrics(self, discount_rate):
+        print(self.cash_flow)
         assert self.cash_flow is not None
         NPV = npv(discount_rate, self.cash_flow)
         IRR = irr(self.cash_flow)
-
         return NPV, IRR
+
+    #def payback(self):
 
 
 if __name__ == '__main__':
@@ -228,12 +230,12 @@ if __name__ == '__main__':
     pump = Pump(2.84).pump()
 
     capex = boiler + turbine + condenser + pump
-    loan = Loan(0.6*capex, 0.4, 10)
+    loan = Loan(0.6 * capex, 0.04, 10)
     capacity_factor = 0.9
 
     analysis = EconomicAnalysis(capex = capex,
                                 water = 1.29 * 10 * 8760 * capacity_factor,
-                                salaries = 4 * 3 * 300000,
+                                salaries = 4 * 3 * 30000,
                                 sales = 1500 * 0.05 * 8760 * capacity_factor,
                                 loan = loan,
                                 capacity_factor = capacity_factor

@@ -199,6 +199,8 @@ if __name__ == '__main__':
     # Calculating financial metrics
     discount_rate = 0.053
 
+    print(cash_flow)
+
     npv = npv(discount_rate, cash_flow)
     irr = irr(cash_flow)
 
