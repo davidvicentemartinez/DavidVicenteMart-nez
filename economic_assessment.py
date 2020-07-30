@@ -147,7 +147,7 @@ if __name__ == '__main__':
     _, interest, principal = loan(quantity, 0.04, 10)
 
     # Calculating depreciation
-    dep_array = depreciation(0.07, capex) 
+    dep_array = depreciation(0.07, capex)
 
     # Calculating sales
     sales = 1500 * 0.05 * 8760 * capacity_factor
@@ -159,6 +159,7 @@ if __name__ == '__main__':
     depreciation  = np.hstack(([0], dep_array, [0 for i in range(years-1-len(dep_array))]))
     loan_prin     = np.hstack(([0], principal, [0 for i in range(years-1-len(principal))]))
     loan_int      = np.hstack(([0], interest, [0 for i in range(years-1-len(interest))]))
+
 
     sales_array    = np.zeros(years)
     water_array    = np.zeros(years)
